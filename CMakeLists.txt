@@ -8,7 +8,7 @@ enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-add_executable(Triangulation main.cpp Poly.cpp)
+add_executable(Triangulation main.cpp Poly.cpp PolyAbs.cpp PolyBase.cpp)
 
 target_link_libraries(Triangulation ${OpenCV_LIBS})
 target_link_libraries(Triangulation ${GSL_LIBRARY})

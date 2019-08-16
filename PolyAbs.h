@@ -1,12 +1,12 @@
-#ifndef POLY_H_
-#define POLY_H_
+#ifndef POLYABS_H_
+#define POLYABS_H_
 
 #include "PolyBase.h"
 
 /**
- *	\brief	Performs non-linear triangulation of two image points by minimizing geometric error.
+ *	\brief	Performs non-linear triangulation of two image points by minimizing the sum of absolute values of the distances.
  */
-class Poly : public PolyBase
+class PolyAbs : public PolyBase
 {
 public:
 	using PolyBase::PolyBase;
@@ -15,4 +15,4 @@ private:
 	std::vector<double> EvaluateRootsCosts(const Roots& roots, const PolyParams& params) const override;
 };
 
-#endif /* POLY_H_ */
+#endif /* POLYABS_H_ */
