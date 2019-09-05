@@ -1,19 +1,18 @@
 #include "PolyBase.h"
 
-#include <gsl/gsl_poly.h>
+namespace Triangulation {
 
 PolyBase::PolyBase(const PolyBase::Fundamental& F)
-	: P0(cv::Mat::eye(3, 4, CV_64F)),
-	P1(CameraProjectionMatrixFromFundamentalMatrix(F)),
-	F(F)
+	: TriangulationBase(cv::Mat::eye(3, 4, CV_64F), CameraProjectionMatrixFromFundamentalMatrix(F)),
+	F(F), LS(P0, P1)
 {}
 
 PolyBase::PolyBase(const cv::Mat& P0, const cv::Mat& P1)
-	: P0(P0), P1(P1), F(ComputeFundamentalMatrix(P0, P1))
+	: TriangulationBase(P0, P1), F(ComputeFundamentalMatrix(P0, P1)), LS(P0, P1)
 {}
 
 PolyBase::PolyBase(const cv::Mat& P0, const cv::Mat& P1, const PolyBase::Fundamental& F)
-	: P0(P0), P1(P1), F(F)
+	: TriangulationBase(P0, P1), F(F), LS(P0, P1)
 {}
 
 std::tuple<PolyBase::Intrinsic, PolyBase::Intrinsic, cv::Mat, cv::Mat> PolyBase::SetOriginToCamera(const cv::Mat& P0, const cv::Mat& P1) const
@@ -67,19 +66,7 @@ cv::Point3d PolyBase::triangulate(const cv::Point2d& p0, const cv::Point2d& p1) 
 	std::tie(x0, x1) = ComputeCorrectedCorrespondences(p0, p1);
 	//std::cout << x0 << std::endl;
 	//std::cout << x1 << std::endl;
-	return TriangulateDLT(x0, x1);
-}
-
-cv::Point3d PolyBase::TriangulateDLT(const cv::Point2d& p0, const cv::Point2d& p1) const
-{
-	cv::Mat A = cv::Mat::zeros(4, 4, CV_64F);
-	A.row(0) = p0.x * P0.row(2) - P0.row(0);
-	A.row(1) = p0.y * P0.row(2) - P0.row(1);
-	A.row(2) = p1.x * P1.row(2) - P1.row(0);
-	A.row(3) = p1.y * P1.row(2) - P1.row(1);
-	cv::Mat result;
-	cv::SVD::solveZ(A, result);
-	return cv::Point3d(result.at<double>(0) / result.at<double>(3), result.at<double>(1) / result.at<double>(3), result.at<double>(2) / result.at<double>(3));
+	return LS.triangulate(x0, x1);
 }
 
 std::pair<cv::Point2d, cv::Point2d> PolyBase::ComputeCorrectedCorrespondences(const cv::Point2d& p0, const cv::Point2d& p1) const
@@ -147,7 +134,7 @@ cv::Mat PolyBase::FormRotationMatrix(const Epipole& e) const
 
 int PolyBase::FindPolynomialOrder(const std::vector<double>& coeffs) const
 {
-	for (int n = coeffs.size()-1; n >= 0; --n)
+	for (int n = static_cast<int>(coeffs.size())-1; n >= 0; --n)
 	{
 		if (coeffs[n] != 0)
 		{
@@ -164,17 +151,13 @@ PolyBase::Roots PolyBase::Solve(const PolyParams& params) const
 	{
 		return {0};
 	}
-
-	double* z = new double[2 * (coeffs.size() - 1)];
-	gsl_poly_complex_workspace* w = gsl_poly_complex_workspace_alloc(coeffs.size());
-	gsl_poly_complex_solve(&coeffs[0], coeffs.size(), w, z);
-	gsl_poly_complex_workspace_free(w);
-	delete[] z;
+	std::vector<cv::Vec2d> roots;
+	cv::solvePoly(coeffs, roots);
 
 	Roots result(coeffs.size()-1);
 	for (size_t i = 0u; i < coeffs.size() - 1; ++i)
 	{
-		result[i] = std::complex<double>(z[2*i], z[2*i+1]);
+		result[i] = std::complex<double>(roots[2*i][0], roots[2*i+1][1]);
 	}
 	return result;
 }
@@ -225,4 +208,6 @@ cv::Mat PolyBase::CameraProjectionMatrixFromFundamentalMatrix(const PolyBase::Fu
 	result.at<double>(1, 3) = e2.at<double>(1);
 	result.at<double>(2, 3) = e2.at<double>(2);
 	return result;
+}
+
 }

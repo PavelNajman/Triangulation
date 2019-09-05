@@ -3,8 +3,12 @@
 
 #include <complex>
 #include <opencv2/opencv.hpp>
+#include "TriangulationBase.h"
+#include "LinearLS.h"
 
-class PolyBase
+namespace Triangulation {
+
+class PolyBase : public TriangulationBase
 {
 public:
 	typedef cv::Matx33d Intrinsic;
@@ -34,7 +38,7 @@ public:
 	 *	\param	p1	Corresponding point in the image of the second camera.
 	 *	\return	Triangulated point.
 	 */
-	cv::Point3d triangulate(const cv::Point2d& p0, const cv::Point2d& p1) const;
+	cv::Point3d triangulate(const cv::Point2d& p0, const cv::Point2d& p1) const override;
 protected:
 	typedef cv::Vec3d Line;
 	typedef cv::Point3d Epipole;
@@ -133,13 +137,6 @@ protected:
 	 */
 	Fundamental ComputeFundamentalMatrix(const cv::Mat& P0, const cv::Mat& P1) const;
 	/**
-	 *	\brief	Triangulate point using The Direct Linear Transformation Method.
-	 *	\param	p0	Point in the image of the first camera.
-	 *	\param	p1	Corresponding point in the image of the second camera.
-	 *	\return	Triangulated point.
-	 */
-	cv::Point3d TriangulateDLT(const cv::Point2d& p0, const cv::Point2d& p1) const;
-	/**
 	 *	\brief	Returns the order of the polynomial with given coefficients (highest non-zero coeffs index).
 	 *	\param	coeffs	Polynomial coefficients.
 	 *	\return	Polynomial order
@@ -152,12 +149,11 @@ protected:
 	 */
 	cv::Mat CameraProjectionMatrixFromFundamentalMatrix(const Fundamental& F) const;
 
-	const cv::Mat P0;
-	const cv::Mat P1;
 	const Fundamental F;
-
-
-
+	/// LinearLS method used for final triangulation of corrected points.
+	const LinearLS LS;
 };
+
+}
 
 #endif /* POLYBASE_H_ */

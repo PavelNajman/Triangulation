@@ -1,5 +1,7 @@
 #include "PolyAbs.h"
 
+namespace Triangulation {
+
 std::vector<double> PolyAbs::PreparePolyCoeffs(const PolyAbs::PolyParams& params) const
 {
 	double a, b, c, d, e, f;
@@ -25,6 +27,7 @@ std::vector<double> PolyAbs::PreparePolyCoeffs(const PolyAbs::PolyParams& params
 		2*a*a*a*b*c*d*e*e*e*e*e*e - a*a*b*b*c*c*e*e*e*e*e*e - a*a*a*a*d*d*e*e*e*e*e*e
 	};
 	result.resize(FindPolynomialOrder(result) + 1);
+	std::transform(result.begin(), result.end(), result.begin(), [&result](double& a){ return a / result.back(); });
 	return result;
 }
 
@@ -45,3 +48,4 @@ std::vector<double> PolyAbs::EvaluateRootsCosts(const PolyAbs::Roots& roots, con
 	return result;
 }
 
+}
