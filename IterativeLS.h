@@ -5,7 +5,7 @@
 
 namespace Triangulation {
 
-class IterativeLinearLS : public TriangulationBase
+class IterativeLS : public TriangulationBase
 {
 public:
 	using TriangulationBase::TriangulationBase;

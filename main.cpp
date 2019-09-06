@@ -2,9 +2,9 @@
 #include "Poly.h"
 #include "PolyAbs.h"
 #include "LinearLS.h"
-#include "IterativeLinearLS.h"
+#include "IterativeLS.h"
 #include "LinearEigen.h"
-#include "IterativeLinearEigen.h"
+#include "IterativeEigen.h"
 
 std::pair<cv::Mat, cv::Mat> SetupGeneralCameraConfiguration()
 {
@@ -251,41 +251,41 @@ TEST(LinearLSTest, HorizontalStereo)
 	EvaluateResult(result, expected_result);
 }
 
-TEST(IterativeLinearLSTest, GeneralSetup)
+TEST(IterativeLSTest, GeneralSetup)
 {
 	cv::Mat P0, P1;
 	std::tie(P0, P1) = SetupGeneralCameraConfiguration();
-	Triangulation::IterativeLinearLS p(P0, P1);
+	Triangulation::IterativeLS p(P0, P1);
 	cv::Point3d result = p.triangulate(cv::Point2d(146, 642.288), cv::Point2d(1137.31, 385.201));
 	cv::Point3d expected_result(0.0, 100.0, 10000.0);
 	EvaluateResult(result, expected_result);
 }
 
-TEST(IterativeLinearLSTest, RotatedLeft)
+TEST(IterativeLSTest, RotatedLeft)
 {
 	cv::Mat P0, P1;
 	std::tie(P0, P1) = SetupSecondCameraRotatedLeftConfiguration();
-	Triangulation::IterativeLinearLS p(P0, P1);
+	Triangulation::IterativeLS p(P0, P1);
 	cv::Point3d result = p.triangulate(cv::Point2d(878.821, 634.619), cv::Point2d(274.917, 511.5));
 	cv::Point3d expected_result(500.0, 0.0, 10000.0);
 	EvaluateResult(result, expected_result);
 }
 
-TEST(IterativeLinearLSTest, RotatedRight)
+TEST(IterativeLSTest, RotatedRight)
 {
 	cv::Mat P0, P1;
 	std::tie(P0, P1) = SetupSecondCameraRotatedRightConfiguration();
-	Triangulation::IterativeLinearLS p(P0, P1);
+	Triangulation::IterativeLS p(P0, P1);
 	cv::Point3d result = p.triangulate(cv::Point2d(1004.08, 511.5), cv::Point2d(150.068, 634.618));
 	cv::Point3d expected_result(500.0, 0.0, 10000.0);
 	EvaluateResult(result, expected_result);
 }
 
-TEST(IterativeLinearLSTest, HorizontalStereo)
+TEST(IterativeLSTest, HorizontalStereo)
 {
 	cv::Mat P0, P1;
 	std::tie(P0, P1) = SetupHorizontalConfiguration();
-	Triangulation::IterativeLinearLS p(P0, P1);
+	Triangulation::IterativeLS p(P0, P1);
 	cv::Point3d result = p.triangulate(cv::Point2d(1004.08, 511.5), cv::Point2d(274.917, 511.5));
 	cv::Point3d expected_result(500.0, 0.0, 10000.0);
 	EvaluateResult(result, expected_result);
@@ -301,11 +301,11 @@ TEST(LinearEigenTest, HorizontalStereo)
 	EvaluateResult(result, expected_result);
 }
 
-TEST(IterativeLinearEigenTest, HorizontalStereo)
+TEST(IterativeEigenTest, HorizontalStereo)
 {
 	cv::Mat P0, P1;
 	std::tie(P0, P1) = SetupHorizontalConfiguration();
-	Triangulation::IterativeLinearEigen p(P0, P1);
+	Triangulation::IterativeEigen p(P0, P1);
 	cv::Point3d result = p.triangulate(cv::Point2d(1004.08, 511.5), cv::Point2d(274.917, 511.5));
 	cv::Point3d expected_result(500.0, 0.0, 10000.0);
 	EvaluateResult(result, expected_result);

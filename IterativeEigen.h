@@ -5,7 +5,7 @@
 
 namespace Triangulation {
 
-class IterativeLinearEigen : public TriangulationBase
+class IterativeEigen : public TriangulationBase
 {
 public:
 	using TriangulationBase::TriangulationBase;
