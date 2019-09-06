@@ -8,8 +8,8 @@ enable_testing()
 find_package(GTest REQUIRED)
 include_directories(${GTEST_INCLUDE_DIRS})
 
-set (HEADERS "Poly.h" "PolyAbs.h" "PolyBase.h" "TriangulationBase.h" "LinearLS.h" "IterativeLinearLS.h")
-set (SOURCES "Poly.cpp" "PolyAbs.cpp" "PolyBase.cpp" "TriangulationBase.cpp" "LinearLS.cpp" "IterativeLinearLS.cpp")
+set (HEADERS "Poly.h" "PolyAbs.h" "PolyBase.h" "TriangulationBase.h" "LinearLS.h" "IterativeLinearLS.h" "LinearEigen.h" "IterativeLinearEigen.h")
+set (SOURCES "Poly.cpp" "PolyAbs.cpp" "PolyBase.cpp" "TriangulationBase.cpp" "LinearLS.cpp" "IterativeLinearLS.cpp" "LinearEigen.cpp" "IterativeLinearEigen.cpp")
 
 add_executable(Triangulation main.cpp ${SOURCES})
 
