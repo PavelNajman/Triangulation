@@ -154,10 +154,10 @@ PolyBase::Roots PolyBase::Solve(const PolyParams& params) const
 	std::vector<cv::Vec2d> roots;
 	cv::solvePoly(coeffs, roots);
 
-	Roots result(coeffs.size()-1);
-	for (size_t i = 0u; i < coeffs.size() - 1; ++i)
+	Roots result(roots.size());
+	for (size_t i = 0u; i < roots.size(); ++i)
 	{
-		result[i] = std::complex<double>(roots[2*i][0], roots[2*i+1][1]);
+		result[i] = std::complex<double>(roots[i][0], roots[i][1]);
 	}
 	return result;
 }
