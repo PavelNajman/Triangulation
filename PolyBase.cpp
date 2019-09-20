@@ -74,7 +74,7 @@ std::pair<cv::Point2d, cv::Point2d> PolyBase::ComputeCorrectedCorrespondences(co
 	cv::Mat T0 = TranslateToOrigin(p0);
 	cv::Mat T1 = TranslateToOrigin(p1);
 
-	cv::Mat f = T1.inv().t() * cv::Mat(F) * T0.inv();
+	cv::Mat f = T1.t() * cv::Mat(F) * T0;
 
 	Epipole e0 = ComputeRightEpipole(f);
 	Epipole e1 = ComputeLeftEpipole(f);
@@ -103,23 +103,23 @@ std::pair<cv::Point2d, cv::Point2d> PolyBase::ComputeCorrectedCorrespondences(co
 cv::Mat PolyBase::TranslateToOrigin(const cv::Point2d& p) const
 {
 	cv::Mat result = cv::Mat::eye(3, 3, CV_64F);
-	result.at<double>(0, 2) = -p.x;
-	result.at<double>(1, 2) = -p.y;
+	result.at<double>(0, 2) = p.x;
+	result.at<double>(1, 2) = p.y;
 	return result;
 }
 
 PolyBase::Epipole PolyBase::ComputeLeftEpipole(const cv::Mat& F) const
 {
-	cv::Mat values, vectors;
-	cv::eigen(F.inv(), values, vectors);
-	return Epipole(vectors.row(0));
+	cv::Mat W, U, VT;
+	cv::SVD::compute(F.t(), W, U, VT);
+	return Epipole(VT.row(2));
 }
 
 PolyBase::Epipole PolyBase::ComputeRightEpipole(const cv::Mat& F) const
 {
-	cv::Mat values, vectors;
-	cv::eigen(F, values, vectors);
-	return Epipole(vectors.row(0));
+	cv::Mat W, U, VT;
+	cv::SVD::compute(F, W, U, VT);
+	return Epipole(VT.row(2));
 }
 
 cv::Mat PolyBase::FormRotationMatrix(const Epipole& e) const
@@ -188,7 +188,7 @@ cv::Point3d PolyBase::TransferPointToOriginalCoordinates(const cv::Point3d& p, c
 	x.at<double>(0) = p.x;
 	x.at<double>(1) = p.y;
 	x.at<double>(2) = p.z;
-	x = T.inv() * R.t() * x;
+	x = T * R.t() * x;
 	return cv::Point3d(x.at<double>(0), x.at<double>(1), x.at<double>(2));
 }
 

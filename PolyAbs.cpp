@@ -27,7 +27,16 @@ std::vector<double> PolyAbs::PreparePolyCoeffs(const PolyAbs::PolyParams& params
 		2*a*a*a*b*c*d*e*e*e*e*e*e - a*a*b*b*c*c*e*e*e*e*e*e - a*a*a*a*d*d*e*e*e*e*e*e
 	};
 	result.resize(FindPolynomialOrder(result) + 1);
-	std::transform(result.begin(), result.end(), result.begin(), [&result](double& a){ return a / result.back(); });
+	double max_coeff = *std::max_element(result.begin(), result.end());
+	if (max_coeff > 0)
+	{
+		std::transform(result.begin(), result.end(), result.begin(), [&max_coeff](double& a){ return a / max_coeff; });
+	}
+	else if (max_coeff < 0)
+	{
+		double min_coeff = *std::min_element(result.begin(), result.end());
+		std::transform(result.begin(), result.end(), result.begin(), [&min_coeff](double& a){ return a / min_coeff; });
+	}
 	return result;
 }
 

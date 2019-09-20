@@ -23,7 +23,16 @@ std::vector<double> Poly::PreparePolyCoeffs(const Poly::PolyParams& params) cons
 		a*a * c * d * e*e*e*e - a * b * c*c * e*e*e*e
 	};
 	result.resize(FindPolynomialOrder(result) + 1);
-	std::transform(result.begin(), result.end(), result.begin(), [&result](double& a){ return a / result.back(); });
+	double max_coeff = *std::max_element(result.begin(), result.end());
+	if (max_coeff > 0)
+	{
+		std::transform(result.begin(), result.end(), result.begin(), [&max_coeff](double& a){ return a / max_coeff; });
+	}
+	else if (max_coeff < 0)
+	{
+		double min_coeff = *std::min_element(result.begin(), result.end());
+		std::transform(result.begin(), result.end(), result.begin(), [&min_coeff](double& a){ return a / min_coeff; });
+	}
 	return result;
 }
 
@@ -33,7 +42,7 @@ std::vector<double> Poly::EvaluateRootsCosts(const Poly::Roots& roots, const Pol
 	std::tie(a, b, c, d, e, f) = params;
 	auto cost_function = [&](double t)
 	{
-		return (t*t / (1 + e*e * t*t)) + ((c*t+d) * (c*t+d) / ((a*t+b) * (a*t+b) + f*f * (c*t+d) * (c*t+d)));
+		return ((t*t) / (1 + e*e * t*t)) + ((c*t+d) * (c*t+d)) / ((a*t+b) * (a*t+b) + f*f * (c*t+d) * (c*t+d));
 	};
 
 	std::vector<double> result(roots.size());
