@@ -18,7 +18,7 @@ public:
 	 *	\brief	Constructor
 	 *	\param	F	Fundamental matrix.
 	 */
-	PolyBase(const Fundamental& F);
+	explicit PolyBase(const Fundamental& F);
 	/**
 	 *	\brief	Constructor
 	 *	\param	P0	Camera matrix of the first camera.
